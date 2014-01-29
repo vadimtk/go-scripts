@@ -52,7 +52,7 @@ if [ $? -ne 0 ] ; then
     exit 1
 fi
 
-echo "Files extracted successfully" >&1
+echo "Files extracted successfully" 
 
 rm -rf $TMP_PATH
 if [ $? -ne 0 ] ; then
@@ -66,11 +66,16 @@ chmod a+x /etc/init.d/percona-agentd
 # check if the system  has chkconfig
 
 if hash update-rc.d 2>/dev/null; then
+        echo "Using update-rc.d to install service" 
         update-rc.d  percona-agentd defaults
 elif hash chkconfig 2>/dev/null; then
+        echo "Using chkconfig to install service" 
         chkconfig percona-agentd on
 else
-        date "$@"
+        echo "Error: No chkconfig nor update-rc.d found " >&2
+        echo "Report following output to cloud-tools@percona.com: " >&2
+        cat /etc/*release >&2 
+        exit 1
 fi
 
 
